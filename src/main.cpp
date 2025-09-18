@@ -38,7 +38,10 @@ void return_to_safety() {
 }
 
 void setup() {
-  Serial.begin(9600);
+  // Enable JST connector.
+  pinMode(15, OUTPUT);
+  digitalWrite(15, HIGH);
+
   display.init();
   sensors.init();
   motors.init();

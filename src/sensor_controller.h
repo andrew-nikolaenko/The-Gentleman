@@ -13,9 +13,10 @@
 #define RIGHT_NOSE_PIN          2
 #define NOSE_COUNT              2
 #define MAX_REFLECTANCE         4096
-#define MAX_DISTANCE            400
+#define MAX_DISTANCE            100
 #define REFLECTANCE_THRESHOLD   2000
-#define DISTANCE_THRESHOLD    100
+#define DISTANCE_THRESHOLD      50
+#define ULTRASONIC_TIMEOUT      10000UL  // 10 ms
 
 enum Position
 {
@@ -35,6 +36,8 @@ private:
 
     void refresh_boundary_position();
     void refresh_enemy_position();
+
+    uint sample_distance(Ultrasonic& sensor);
 
 public:
     SensorController();

@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <Arduino.h>
 #include "sensor_controller.h"
 
 int16_t leftDistance;
@@ -12,8 +14,8 @@ Position enemyPosition;
 Position prevEnemyPosition;
 
 SensorController::SensorController() 
-    : leftEye(LEFT_EYE_TRIG_PIN, LEFT_EYE_ECHO_PIN),
-      rightEye(RIGHT_EYE_TRIG_PIN, RIGHT_EYE_ECHO_PIN),
+    : leftEye(LEFT_EYE_TRIG_PIN, LEFT_EYE_ECHO_PIN, ULTRASONIC_TIMEOUT),
+      rightEye(RIGHT_EYE_TRIG_PIN, RIGHT_EYE_ECHO_PIN, ULTRASONIC_TIMEOUT),
       qtr() {
 }
 
@@ -25,6 +27,23 @@ void SensorController::init() {
     prevBoundaryPosition = None;
     enemyPosition = None;
     prevEnemyPosition = None;
+}
+
+
+uint SensorController::sample_distance(Ultrasonic& sensor) {
+    const int SAMPLES = 5;
+    unsigned long samples[SAMPLES];
+
+    // Take samples
+    for (int i = 0; i < SAMPLES; i++) {
+        samples[i] = sensor.read();
+    }
+
+    // Sort samples
+    std::sort(samples, samples + SAMPLES);
+
+    // Return median value
+    return samples[SAMPLES / 2];
 }
 
 void SensorController::refresh_boundary_position() {
@@ -49,8 +68,8 @@ void SensorController::refresh_boundary_position() {
 void SensorController::refresh_enemy_position() {
     prevEnemyPosition = enemyPosition;
     
-    leftDistance = leftEye.read();
-    rightDistance = rightEye.read();
+    leftDistance = min(sample_distance(leftEye), (uint)MAX_DISTANCE);
+    rightDistance = min(sample_distance(rightEye), (uint)MAX_DISTANCE);
     
     if (leftDistance < DISTANCE_THRESHOLD && rightDistance < DISTANCE_THRESHOLD) {
         enemyPosition = Front;

@@ -57,22 +57,22 @@ void DisplayController::draw_meter(int x, int y, int width, int height, int perc
 }
 
 void DisplayController::display_boundary_info() {
-    int distanceThresholdPercent = ((float)DISTANCE_THRESHOLD / (float)MAX_DISTANCE) * 100;
+    int reflectanceThresholdPercent = 100 - ((float)REFLECTANCE_THRESHOLD / (float)MAX_REFLECTANCE) * 100;
     
     const int METER_WIDTH = 20;  // Width of the boundary meters
     const int MARGIN = 5;        // Space from the edge of the screen
     
     // Draw left boundary meter
-    int leftPercentage = ((float)leftReflectance / (float)MAX_REFLECTANCE) * 100;
-    draw_meter(MARGIN, 0, METER_WIDTH, tft.height(), leftPercentage, TFT_RED, true, distanceThresholdPercent, false);
+    int leftPercentage = 100 - ((float)leftReflectance / (float)MAX_REFLECTANCE) * 100;
+    draw_meter(MARGIN, 0, METER_WIDTH, tft.height(), leftPercentage, TFT_RED, true, reflectanceThresholdPercent, false);
 
     // Draw right boundary meter
-    int rightPercentage = ((float)rightReflectance / (float)MAX_REFLECTANCE) * 100;
-    draw_meter(tft.width() - METER_WIDTH - MARGIN, 0, METER_WIDTH, tft.height(), rightPercentage, TFT_RED, true, distanceThresholdPercent, false);
+    int rightPercentage = 100 - ((float)rightReflectance / (float)MAX_REFLECTANCE) * 100;
+    draw_meter(tft.width() - METER_WIDTH - MARGIN, 0, METER_WIDTH, tft.height(), rightPercentage, TFT_RED, true, reflectanceThresholdPercent, false);
 }
 
 void DisplayController::display_enemy_info() {
-    int reflectanceThresholdPercent = ((float)REFLECTANCE_THRESHOLD / (float)MAX_REFLECTANCE) * 100;
+    int distanceThresholdPercent = 100 - ((float)DISTANCE_THRESHOLD / (float)MAX_DISTANCE) * 100;
 
     const int METER_HEIGHT = 20;     // Height of the enemy meters
     const int TOP_MARGIN = 5;        // Space from the top of the screen
@@ -82,12 +82,12 @@ void DisplayController::display_enemy_info() {
     int meterWidth = (tft.width() - 2 * SIDE_MARGIN) / 2;
 
     // Draw left enemy proximity meter at the top left
-    int leftPercentage = ((float)leftReflectance / (float)MAX_REFLECTANCE) * 100;
-    draw_meter(SIDE_MARGIN, TOP_MARGIN, meterWidth, METER_HEIGHT, leftPercentage, TFT_BLUE, false, reflectanceThresholdPercent, false);
+    int leftPercentage = 100 - ((float)leftDistance / (float)MAX_DISTANCE) * 100;
+    draw_meter(SIDE_MARGIN, TOP_MARGIN, meterWidth, METER_HEIGHT, leftPercentage, TFT_BLUE, false, distanceThresholdPercent, false);
 
     // Draw right enemy proximity meter at the top right
-    int rightPercentage = ((float)rightReflectance / (float)MAX_REFLECTANCE) * 100;
-    draw_meter(SIDE_MARGIN + meterWidth, TOP_MARGIN, meterWidth, METER_HEIGHT, rightPercentage, TFT_BLUE, false, reflectanceThresholdPercent, true);
+    int rightPercentage = 100 - ((float)rightDistance / (float)MAX_DISTANCE) * 100;
+    draw_meter(SIDE_MARGIN + meterWidth, TOP_MARGIN, meterWidth, METER_HEIGHT, rightPercentage, TFT_BLUE, false, distanceThresholdPercent, true);
 }
 
 void DisplayController::drawEyes(int xOffset) {
