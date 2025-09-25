@@ -13,6 +13,9 @@ void DisplayController::init() {
     leftEyeX = tft.width()/3;
     rightEyeX = 2*tft.width()/3;
     eyeY = tft.height()/2;
+
+    textChanged = false;
+    text = "";
     
     // Draw initial eyes looking forward
     drawEyes(0);
@@ -22,15 +25,13 @@ void DisplayController::refresh() {
     display_boundary_info();
     display_enemy_info();
     display_robot_direction();
+    display_text();
 }
 
 void DisplayController::draw_meter(int x, int y, int width, int height, int percentage, uint32_t color, bool vertical, int thresholdPercent, bool reverse) {
     // Calculate filled area based on percentage
     int filledWidth = (percentage * width) / 100;
     int filledHeight = (percentage * height) / 100;
-    
-    // First, fill the entire meter area with black
-    tft.fillRect(x + 1, y + 1, width - 2, height - 2, TFT_BLACK);
     
     // Draw the filled portion of the meter
     if (vertical) {
@@ -39,6 +40,17 @@ void DisplayController::draw_meter(int x, int y, int width, int height, int perc
     } else {
         int fillX = reverse ? (x + width - filledWidth) : x;
         tft.fillRect(fillX, y + 1, filledWidth, height - 2, color);
+    }
+
+    // Draw the unfilled portion of the meter
+    if (vertical) {
+        int unfilledHeight = height - filledHeight - 2;
+        int unfillY = reverse ? (y + filledHeight + 1) : y;
+        tft.fillRect(x + 1, unfillY, width - 2, unfilledHeight, TFT_BLACK);
+    } else {
+        int unfilledWidth = width - filledWidth - 2;
+        int unfillX = reverse ? x : (x + filledWidth + 1);
+        tft.fillRect(unfillX, y + 1, unfilledWidth, height - 2, TFT_BLACK);
     }
 
     // Draw threshold line if applicable
@@ -126,5 +138,23 @@ void DisplayController::display_robot_direction() {
                 lookCenter();
                 break;
         }
+    }
+}
+
+void DisplayController::display_text() {
+    // Only redraw if the text has changed
+    if (textChanged) {
+        tft.fillRect(30, tft.height() - 30, tft.width() - 60, 30, TFT_BLACK); // Clear previous text area
+        tft.setCursor(35, tft.height() - 25);
+        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        tft.print(text);
+        textChanged = false;
+    }
+}
+
+void DisplayController::set_text(const String& newText) {
+    if (text != newText) {
+        text = newText;
+        textChanged = true;
     }
 }

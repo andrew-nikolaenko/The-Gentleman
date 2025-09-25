@@ -9,13 +9,28 @@ Direction prevRobotDirection;
 Direction robotDirection;
 
 MotorController::MotorController()
-    : _motorA_in1(MOTOR_A_PIN_0), _motorA_in2(MOTOR_A_PIN_1), _motorB_in1(MOTOR_B_PIN_0), _motorB_in2(MOTOR_B_PIN_1) {}
+    : _motorA_in1(MOTOR_A_PIN_0), _motorA_in2(MOTOR_A_PIN_1), _motorA_enable(MOTOR_A_ENABLE_PIN),
+      _motorB_in1(MOTOR_B_PIN_0), _motorB_in2(MOTOR_B_PIN_1), _motorB_enable(MOTOR_B_ENABLE_PIN) {}
 
 void MotorController::init() {
+    // Set direction pins as outputs
     pinMode(_motorA_in1, OUTPUT);
     pinMode(_motorA_in2, OUTPUT);
     pinMode(_motorB_in1, OUTPUT);
     pinMode(_motorB_in2, OUTPUT);
+    
+    // Initialize direction pins to LOW
+    digitalWrite(_motorA_in1, LOW);
+    digitalWrite(_motorA_in2, LOW);
+    digitalWrite(_motorB_in1, LOW);
+    digitalWrite(_motorB_in2, LOW);
+
+    // Setup PWM for dual motor speed control
+    ledcSetup(PWM_CHANNEL_A, PWM_FREQ_HZ, PWM_RES_BITS);
+    ledcSetup(PWM_CHANNEL_B, PWM_FREQ_HZ, PWM_RES_BITS);
+    ledcAttachPin(_motorA_enable, PWM_CHANNEL_A);
+    ledcAttachPin(_motorB_enable, PWM_CHANNEL_B);
+
     stop();
 
     prevRobotDirection = GoingLeft;
@@ -24,10 +39,13 @@ void MotorController::init() {
 
 // speed >0 forward, <0 backward, 0 stop
 void MotorController::setMotor(uint8_t in1Pin, uint8_t in2Pin, int16_t speed, bool isLeft) {
+    uint8_t pwmChannel = isLeft ? PWM_CHANNEL_A : PWM_CHANNEL_B;
+    
     if (speed > 0) {
         // Forward
-        analogWrite(in1Pin, speed);
+        digitalWrite(in1Pin, HIGH);
         digitalWrite(in2Pin, LOW);
+        ledcWrite(pwmChannel, speed);
         if (isLeft) {
             motorA1 = speed;
             motorA2 = 0;
@@ -38,7 +56,8 @@ void MotorController::setMotor(uint8_t in1Pin, uint8_t in2Pin, int16_t speed, bo
     } else if (speed < 0) {
         // Backward
         digitalWrite(in1Pin, LOW);
-        analogWrite(in2Pin, -speed);
+        digitalWrite(in2Pin, HIGH);
+        ledcWrite(pwmChannel, -speed);
         if (isLeft) {
             motorA1 = 0;
             motorA2 = -speed;
@@ -50,6 +69,7 @@ void MotorController::setMotor(uint8_t in1Pin, uint8_t in2Pin, int16_t speed, bo
         // Stop
         digitalWrite(in1Pin, LOW);
         digitalWrite(in2Pin, LOW);
+        ledcWrite(pwmChannel, 0);
         if (isLeft) {
             motorA1 = 0;
             motorA2 = 0;

@@ -37,8 +37,6 @@ private:
     void refresh_boundary_position();
     void refresh_enemy_position();
 
-    uint sample_distance(Ultrasonic& sensor);
-
 public:
     SensorController();
     void init();

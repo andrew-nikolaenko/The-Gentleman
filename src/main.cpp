@@ -9,17 +9,22 @@ DisplayController display;
 
 void search_mode()
 {
-  if (prevEnemyPosition == Left || None) { // left or none
+  int pattern = (millis() / (1000 * 2)) % 4; // Change pattern every 2 seconds
+  if (pattern == 0) {
     motors.turnLeft();
-  } else if (prevEnemyPosition == Right) { // right
+  } else if (pattern == 1) {
+    motors.forward();
+  } else if (pattern == 2) {
     motors.turnRight();
+  } else {
+    motors.forward();
   }
 }
 
 void destroy_mode()
 {
   if (enemyPosition == Front) { // enemy in front
-    motors.forward();
+    motors.forward(MAX_SPEED);
   } else if (enemyPosition == Left) { // enemy to the left
     motors.turnLeft();
   } else if (enemyPosition == Right) { // enemy to the right
@@ -53,15 +58,18 @@ void loop() {
   // Check if we're out of bounds.
   if (boundaryPosition != None)
   {
+    display.set_text("Out of bounds!");
     return_to_safety();
   }
   else
   {
     // Make a decision.
     if (enemyPosition == None) { // no enemy position
+      display.set_text("Searching...");
       search_mode();
     } else 
     {
+      display.set_text("DESTROYING");
       destroy_mode();
     }
   }

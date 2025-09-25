@@ -21,6 +21,9 @@ private:
     int eyeY;
     int currentEyeState;  // 0: center, -1: left, 1: right
 
+    bool textChanged;
+    String text;
+
     void display_boundary_info();
     void display_enemy_info();
     void lookLeft();
@@ -29,11 +32,13 @@ private:
     void drawEyes(int xOffset);
     void display_robot_direction();
     void draw_meter(int x, int y, int width, int height, int percentage, uint32_t color, bool vertical, int thresholdPercent, bool reverse);
+    void display_text();
 
 public:
     DisplayController();
     void init();
     void refresh();
+    void set_text(const String& newText);
 };
 
 extern DisplayController display;
