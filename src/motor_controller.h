@@ -16,7 +16,7 @@
 #define PWM_RES_BITS   8
 
 #define NORMAL_SPEED 200
-#define MAX_SPEED 255
+#define MAX_SPEED 230
 
 enum Direction
 {
